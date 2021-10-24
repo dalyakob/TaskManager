@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TaskManagerGC.Data;
-using TaskManagerGC.Models;
 
 namespace TaskManagerGC.Controllers
 {
@@ -18,9 +17,30 @@ namespace TaskManagerGC.Controllers
             _context = context;
         }
         // GET: TaskController
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string search, string orderBy)
         {
-            return View(await _context.Tasks.ToListAsync());
+            var tasks = await _context.Tasks.OrderByDescending(x => x.CreatedDate).ToListAsync();
+
+            ViewBag.search = search;
+
+            if (!string.IsNullOrEmpty(search))
+            { 
+                tasks = await _context.Tasks.Where(x => x.Description.Contains(search) || x.Title.Contains(search) ).ToListAsync();
+            }
+
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                if (orderBy.Equals("dueDate"))
+                {
+                    tasks = tasks.OrderByDescending(x => x.DueDate).ToList();
+                }
+                else if (orderBy.Equals("completed"))
+                {
+                    tasks = tasks.OrderByDescending(x => x.Completed).ToList();
+                }
+            }
+
+            return View(tasks);
         }
 
         // GET: TaskController/Details/5
@@ -117,11 +137,27 @@ namespace TaskManagerGC.Controllers
                 }
             }
         }
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return NotFound();
+            }
+
+            var task = await _context.Tasks.FindAsync(id);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            return View(task);
+        }
 
         // POST: Task/Delete/5
-        [HttpPost("Task/Delete/{id}")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, IFormCollection collection)
         {
             if (id == Guid.Empty)
             {
