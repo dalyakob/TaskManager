@@ -50,7 +50,7 @@
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                     @*<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
-                    <button id="btnShowModal" type="button"
+                    <button id="btnShowModal" title="btnShowModal" type="button"
                             class="btn btn-link" style="color: darkred; padding:0px">
                         Delete
                     </button>
@@ -96,7 +96,7 @@
                                 <div class="modal-footer"> 
                                     @using (Html.BeginForm("Delete", "Task", new { id = item.Id }, FormMethod.Post))
                                     {
-                                        <a href="@Url.Action("Delete", "Task", new { id = item.Id })">Yes</a>
+                                        <button type="submit"  class="btn btn-danger">Yes</button>
                                         <button type="button" id="btnHideModal" class="btn btn-dark">Close</button>
                                     }
                                 </div>
@@ -113,13 +113,19 @@
 
 <script type="text/javascript">
 
-        $(document).ready(function () {
-            $("#btnShowModal").click(function () {
-                $("#delete-modal").modal('show');
-            });
+    $(document).ready(function () {
+        window.addEventListener
+        this.buttons = document.querySelectorAll('#btnShowModal');
 
-            $("#btnHideModal").click(function () {
-                $("#delete-modal").modal('hide');
-            });
-        });
+        this.gridButtonItems = [].slice.call(this.buttons);
+        this.gridButtonItems.forEach(function (item, index) {
+            item.addEventListener('click', function () {
+                $("#delete-modal").modal('show');
+            }
+        })
+    });
+
+    //$("#btnHideModal").click(function () {
+    //    $("#delete-modal").modal('hide');
+    //});
 </script>
